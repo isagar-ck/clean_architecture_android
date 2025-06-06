@@ -13,7 +13,7 @@ import com.example.cleanarchitecture.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity() {
+class MainActivity : BaseActivity() {
     private val TAG = "MainActivity"
     private lateinit var binding: ActivityMainBinding
     private val viewModel: UserViewModel by viewModels()
@@ -21,18 +21,16 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         binding = ActivityMainBinding.inflate(layoutInflater)
         binding.lifecycleOwner = this
         setContentView(binding.root)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
 
+        setUpViews()
+        setUpObserve()
+    }
+
+    private fun setUpViews() {
         with(binding) {
-
             binding.feedsRecyclerview.adapter = adapter
 
             feedsRecyclerview.addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -54,7 +52,12 @@ class MainActivity : AppCompatActivity() {
                 viewModel.fetchUsers(true)
             }
         }
+    }
 
+    /**
+     * This function use for setup observer for get users list
+     * */
+    fun setUpObserve() {
         with(viewModel) {
             fetchUsers()
             users.observe(this@MainActivity) {
